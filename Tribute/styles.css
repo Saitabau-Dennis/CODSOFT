@@ -30,6 +30,7 @@ nav ul {
     padding: 0;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 nav ul li {
@@ -199,6 +200,7 @@ nav ul li a:hover {
     color: #00b894;
     margin-top: 0;
 }
+
 .timeline {
     position: relative;
     max-width: 1000px;
@@ -284,7 +286,6 @@ nav ul li a:hover {
     font-size: 1.1em;
 }
 
-
 footer {
     background: linear-gradient(135deg, #6c5ce7, #fd79a8);
     color: white;
@@ -292,30 +293,66 @@ footer {
     padding: 1em 0;
     margin-top: 2em;
 }
+
 @media (max-width: 768px) {
     .hero-overlay h1 {
         font-size: 3em;
     }
+
     .hero-subtitle {
         font-size: 1.5em;
     }
+
     .content-section {
         padding: 60px 20px;
     }
+
     .legacy-text, .legacy-achievements {
         flex-basis: 100%;
     }
+
     .timeline-item {
         width: 100%;
         left: 0;
     }
+
     .timeline::after {
         left: 31px;
     }
+
     .timeline-item::after {
         left: 15px;
     }
+
     .right::after {
         left: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 0.5em 0;
+    }
+
+    .hero-overlay h1 {
+        font-size: 2em;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2em;
+    }
+
+    .content-section h2 {
+        font-size: 2em;
+    }
+
+    .legacy-container, .impact-grid {
+        flex-direction: column;
+        align-items: center;
     }
 }
