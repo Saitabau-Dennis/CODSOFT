@@ -11,18 +11,43 @@ body {
     background-attachment: fixed;
 }
 
-.container {
+header {
+    background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+    padding: 1em 0;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-header {
-    background: linear-gradient(135deg, #6c5ce7, #fd79a8);
-    padding: 1em 0;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
+.brand-logo {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.menu-toggle .bar {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 4px 0;
+    transition: 0.4s;
 }
 
 nav ul {
@@ -30,7 +55,6 @@ nav ul {
     padding: 0;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
 }
 
 nav ul li {
@@ -46,6 +70,50 @@ nav ul li a {
 
 nav ul li a:hover {
     color: #feca57;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    nav ul {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 60px;
+        left: -100%;
+        background-color: #6c5ce7;
+        transition: all 0.5s ease;
+    }
+
+    nav ul li {
+        margin: 0;
+        text-align: center;
+    }
+
+    nav ul li a {
+        padding: 1em;
+        display: block;
+        color: white;
+    }
+
+    nav ul.show {
+        left: 0;
+    }
+
+    .menu-toggle.toggle .bar:nth-child(1) {
+        transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .menu-toggle.toggle .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-toggle.toggle .bar:nth-child(3) {
+        transform: rotate(45deg) translate(-5px, -6px);
+    }
 }
 
 .hero-section {
@@ -330,28 +398,43 @@ footer {
 }
 
 @media (max-width: 480px) {
-    nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    nav ul li {
-        margin: 0.5em 0;
-    }
-
     .hero-overlay h1 {
-        font-size: 2em;
+        font-size: 2.5em;
     }
 
     .hero-subtitle {
         font-size: 1.2em;
     }
 
-    .content-section h2 {
-        font-size: 2em;
+    .content-section {
+        padding: 40px 20px;
     }
 
-    .legacy-container, .impact-grid {
+    .title {
+        font-size: 1.2em;
+    }
+
+    .timeline-item {
+        padding: 10px 20px;
+    }
+
+    .timeline-item h3 {
+        font-size: 1.2em;
+    }
+
+    .timeline-item .date {
+        font-size: 1em;
+    }
+
+    .legacy-text, .legacy-achievements {
+        padding: 20px;
+    }
+
+    .impact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .journey-grid {
         flex-direction: column;
         align-items: center;
     }
