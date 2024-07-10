@@ -15,7 +15,7 @@ import {
 
 function EmployerDashboard() {
   return (
-    <div className="min-h-screen bg-gray-900 font-sans text-white bg-opacity-95 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0iIzFhMWIyNiI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxLjUiIGZpbGw9IiMyMTIyMmYiPjwvY2lyY2xlPgo8L3N2Zz4=')]">
+    <div className="min-h-screen bg-gray-900 font-poppins text-white bg-opacity-95 ">
       <Header />
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-purple-500 mb-8">
@@ -39,7 +39,7 @@ function Header() {
   };
 
   return (
-    <header className="bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg sticky top-0 z-50">
+    <header className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <Link
@@ -81,7 +81,7 @@ function Header() {
             </Link>
             <Link
               to="/employer/post-job"
-              className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
+             className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
             >
               Post Job
             </Link>
@@ -130,7 +130,7 @@ function DashboardOverview() {
         transition={{ duration: 0.5 }}
       >
         <h3 className="text-xl font-semibold mb-2">Active Jobs</h3>
-        <p className="text-3xl font-bold text-purple-500">12</p>
+        <p className="text-3xl font-bold text-purple-500"></p>
       </motion.div>
       <motion.div
         className="bg-gray-800 rounded-xl p-6 shadow-xl"
@@ -139,7 +139,7 @@ function DashboardOverview() {
         transition={{ duration: 0.5, delay: 0.1 }}
       >
         <h3 className="text-xl font-semibold mb-2">Total Applications</h3>
-        <p className="text-3xl font-bold text-purple-500">48</p>
+        <p className="text-3xl font-bold text-purple-500"></p>
       </motion.div>
       <motion.div
         className="bg-gray-800 rounded-xl p-6 shadow-xl"
@@ -148,7 +148,7 @@ function DashboardOverview() {
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <h3 className="text-xl font-semibold mb-2">Interviews Scheduled</h3>
-        <p className="text-3xl font-bold text-purple-500">5</p>
+        <p className="text-3xl font-bold text-purple-500"></p>
       </motion.div>
     </div>
   );

@@ -166,7 +166,7 @@ function FeaturedJobsSection() {
         </div>
         <div className="text-center mt-12">
           <Link
-            to="/find-jobs"
+            to="/auth"
             className="bg-purple-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-purple-700 transition duration-300 inline-block text-base transform hover:scale-105"
           >
             Explore All Opportunities →
