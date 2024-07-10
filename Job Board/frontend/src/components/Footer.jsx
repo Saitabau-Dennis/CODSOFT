@@ -25,7 +25,7 @@ function Footer() {
               <FooterLink to="/about" text="About Us" />
               <FooterLink to="/jobs" text="Explore Careers" />
               <FooterLink to="/employers" text="For Employers" />
-              <FooterLink to="/blog" text="Career Insights" />
+              <FooterLink to="/CareerInsights" text="Career Insights" />
             </ul>
           </div>
           <div>

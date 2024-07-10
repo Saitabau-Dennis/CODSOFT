@@ -5,6 +5,8 @@ import AuthPage from './pages/AuthPage';
 import CandidateDashboard from "./pages/CandidateDashboard";
 import EmployerDashboard from './pages/EmployerDashboard';
 import About from './pages/about';
+import Contact from './pages/contact';
+import CareerInsights from './pages/CareerInsights';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/candidate/*" element={<CandidateDashboard />} />
         <Route path="/employer/*" element={<EmployerDashboard />} />
         <Route path="/about" element={<About/>}/>
+        <Route path="/contact" element={<Contact/>}/>
+        <Route path="CareerInsights" element={<CareerInsights/>}/>
       </Routes>
     </Router>
   );
