@@ -1,5 +1,5 @@
 // HomePage.js
-import React from "react";
+import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaBriefcase, FaRocket } from "react-icons/fa";
 import Footer from "../components/Footer";
@@ -24,8 +24,9 @@ function HomePage() {
     </div>
   );
 }
-
 function Header({ onSignIn, isLoggedIn }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const handleNavigation = (e) => {
     if (!isLoggedIn) {
       e.preventDefault();
@@ -33,31 +34,58 @@ function Header({ onSignIn, isLoggedIn }) {
     }
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <header className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="text-2xl font-extrabold text-purple-500 tracking-wider">CareerLaunch</div>
-        <div className="space-x-6">
-          <Link
-            to="/find-jobs"
-            onClick={handleNavigation}
-            className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
-          >
-            Explore Careers
-          </Link>
-          <Link
-            to="/employer-dashboard"
-            onClick={handleNavigation}
-            className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
-          >
-            Post a Job
-          </Link>
+        <div className="md:hidden">
           <button
-            onClick={onSignIn}
-            className="bg-purple-600 text-white px-5 py-2 rounded-full hover:bg-purple-700 transition duration-300 font-semibold text-base transform hover:scale-105"
+            onClick={toggleMenu}
+            className="text-gray-300 hover:text-purple-400 focus:outline-none"
           >
-            Join Now
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
           </button>
+        </div>
+        <div className={`absolute md:relative top-full left-0 right-0 bg-gray-900 md:bg-transparent ${menuOpen ? 'block' : 'hidden'} md:flex md:items-center md:w-auto`}>
+          <div className="flex flex-col md:flex-row items-end md:items-center py-4 md:py-0 px-4 md:px-0">
+            <Link
+              to="/find-jobs"
+              onClick={handleNavigation}
+              className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium block mb-2 md:mb-0 md:mr-6"
+            >
+              Explore Careers
+            </Link>
+            <Link
+              to="/employer-dashboard"
+              onClick={handleNavigation}
+              className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium block mb-2 md:mb-0 md:mr-6"
+            >
+              Post a Job
+            </Link>
+            <button
+              onClick={onSignIn}
+              className="bg-purple-600 text-white px-5 py-2 rounded-full hover:bg-purple-700 transition duration-300 font-semibold text-base transform hover:scale-105"
+            >
+              Join Now
+            </button>
+          </div>
         </div>
       </nav>
     </header>

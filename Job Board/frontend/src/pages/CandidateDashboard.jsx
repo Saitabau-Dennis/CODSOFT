@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, Link, useParams } from "react-router-dom";
 import {
   FaSearch,
@@ -11,15 +11,17 @@ import Footer from "../components/Footer";
 
 function CandidateDashboard() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white font-poppins">
+    <div className="min-h-screen bg-gray-900 text-white font-poppins flex flex-col">
       <Header />
-      <Routes>
-        <Route index element={<JobSearch />} />
-        <Route path="jobs/:id" element={<JobDetail />} />
-        <Route path="apply/:id" element={<JobApplication />} />
-        <Route path="profile" element={<ProfileManagement />} />
-        <Route path="job-listing" element={<JobListing />} />
-      </Routes>
+      <div className="flex-grow">
+        <Routes>
+          <Route index element={<JobSearch />} />
+          <Route path="jobs/:id" element={<JobDetail />} />
+          <Route path="apply/:id" element={<JobApplication />} />
+          <Route path="profile" element={<ProfileManagement />} />
+          <Route path="job-listing" element={<JobListing />} />
+        </Routes>
+      </div>
       <Footer />
     </div>
   );
@@ -28,14 +30,14 @@ function CandidateDashboard() {
 function Header() {
   return (
     <header className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <nav className="container mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center">
         <Link
           to="/candidate"
-          className="text-2xl font-extrabold text-purple-500 tracking-wider"
+          className="text-2xl font-extrabold text-purple-500 tracking-wider mb-4 sm:mb-0"
         >
           CareerLaunch
         </Link>
-        <div className="space-x-6">
+        <div className="space-x-4 sm:space-x-6">
           <Link
             to="/candidate/job-listing"
             className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
@@ -56,11 +58,13 @@ function Header() {
 
 function JobSearch() {
   return (
-    <section className="bg-gray-900 text-white py-24">
-      <div className="container mx-auto px-6 text-center">
-        <h2 className="text-3xl font-bold mb-8">Search for Jobs</h2>
-        <div className="bg-gray-800 rounded-xl p-6 shadow-2xl max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+    <section className="bg-gray-900 text-white py-16 sm:py-24 mb-16 sm:mb-32">
+      <div className="container mx-auto px-4 sm:px-6 text-center">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4">Find Your Dream Job</h1>
+        <p className="text-xl mb-8">Discover opportunities that match your skills and aspirations</p>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8">Search for Jobs</h2>
+        <div className="bg-gray-800 rounded-xl p-4 sm:p-6 shadow-2xl max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="flex-1 relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -89,7 +93,7 @@ function JobSearch() {
 }
 
 function JobListing() {
-  const jobs = [
+  const [jobs] = useState([
     {
       id: 1,
       title: "AI Research Scientist",
@@ -118,14 +122,67 @@ function JobListing() {
       location: "Austin, TX",
       type: "Full-time",
     },
-  ];
+    // More jobs...
+  ]);
+  const [jobType, setJobType] = useState("");
+  const [sortCriteria, setSortCriteria] = useState("title");
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 2;
+
+  // Filter jobs by type
+  const filteredJobs = jobType
+    ? jobs.filter((job) => job.type === jobType)
+    : jobs;
+
+  // Sort jobs
+  const sortedJobs = filteredJobs.sort((a, b) => {
+    if (sortCriteria === "title") {
+      return a.title.localeCompare(b.title);
+    } else if (sortCriteria === "location") {
+      return a.location.localeCompare(b.location);
+    } else {
+      return a.company.localeCompare(b.company);
+    }
+  });
+
+  // Pagination logic
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = sortedJobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  const totalPages = Math.ceil(sortedJobs.length / jobsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
-    <section className="py-24 bg-gray-900 text-white">
-      <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center mb-12">Job Listings</h2>
-        <div className="grid md:grid-cols-2 gap-8">
-          {jobs.map((job) => (
+    <section className="py-16 sm:py-24 bg-gray-900 text-white">
+      <div className="container mx-auto px-4 sm:px-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Job Listings</h2>
+        <div className="flex justify-between mb-6">
+          <select
+            className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+            value={jobType}
+            onChange={(e) => setJobType(e.target.value)}
+          >
+            <option value="">All Job Types</option>
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Contract">Contract</option>
+          </select>
+          <select
+            className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+            value={sortCriteria}
+            onChange={(e) => setSortCriteria(e.target.value)}
+          >
+            <option value="title">Sort by Title</option>
+            <option value="location">Sort by Location</option>
+            <option value="company">Sort by Company</option>
+          </select>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+          {currentJobs.map((job) => (
             <Link
               to={`/candidate/jobs/${job.id}`}
               key={job.id}
@@ -144,6 +201,19 @@ function JobListing() {
                 <span>{job.type}</span>
               </div>
             </Link>
+          ))}
+        </div>
+        <div className="flex justify-center mt-8">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              className={`px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold hover:bg-purple-700 transition duration-300 mr-2 ${
+                currentPage === index + 1 ? "bg-purple-700" : ""
+              }`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
           ))}
         </div>
       </div>
@@ -350,3 +420,4 @@ function ProfileManagement() {
 }
 
 export default CandidateDashboard;
+
