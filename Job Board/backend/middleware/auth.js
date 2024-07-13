@@ -1,31 +1,28 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
 
-const auth = async (req, res, next) => {
+exports.verifyToken = (req, res, next) => {
+  const token = req.header('Authorization');
+  if (!token) return res.status(401).json({ error: 'Access denied' });
+
   try {
-    // Get token from header
-    const token = req.header('Authorization').replace('Bearer ', '');
-
-    if (!token) {
-      return res.status(401).json({ error: 'No token, authorization denied' });
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Find user
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    // Add user to request object
-    req.user = user;
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Token is not valid' });
+    res.status(400).json({ error: 'Invalid token' });
   }
 };
 
-module.exports = auth;
+exports.isEmployer = (req, res, next) => {
+  if (req.user.userType !== 'employer') {
+    return res.status(403).json({ error: 'Access denied. Employers only.' });
+  }
+  next();
+};
+
+exports.isCandidate = (req, res, next) => {
+  if (req.user.userType !== 'candidate') {
+    return res.status(403).json({ error: 'Access denied. Candidates only.' });
+  }
+  next();
+};

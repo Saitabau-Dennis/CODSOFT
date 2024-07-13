@@ -259,7 +259,7 @@ function JobForm({ formData, handleInputChange, handlePostJob }) {
         value={formData.description}
         onChange={handleInputChange}
       />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <InputField
           label="Company"
           name="company"
@@ -275,6 +275,12 @@ function JobForm({ formData, handleInputChange, handlePostJob }) {
         <InputField
           label="Salary"
           name="salary"
+          value={formData.salary}
+          onChange={handleInputChange}
+        />
+          <InputField
+          label="Job Type"
+          name="jobtype"
           value={formData.salary}
           onChange={handleInputChange}
         />

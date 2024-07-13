@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaEnvelope, FaLock, FaUser, FaGoogle } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import axios from "axios";
 
 function AuthForm() {
@@ -20,7 +20,7 @@ function AuthForm() {
 
   useEffect(() => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("userType");
   }, []);
 
   const handleChange = (e) => {
@@ -63,7 +63,6 @@ function AuthForm() {
     }
     return true;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -80,7 +79,7 @@ function AuthForm() {
       let response;
       if (isSignUp) {
         response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/authRoutes/register`,
+          `${process.env.REACT_APP_API_URL}/api/auth/register`,
           {
             name,
             email,
@@ -91,18 +90,27 @@ function AuthForm() {
         setFormState((prevState) => ({
           ...prevState,
           success: "Registration successful! You can now log in.",
+          isSignUp: false, // Switch to login mode after successful registration
         }));
       } else {
         response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/authRoutes/login`,
+          `${process.env.REACT_APP_API_URL}/api/auth/login`,
           {
             email,
             password,
           }
         );
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        navigate("/dashboard");
+        localStorage.setItem("userType", response.data.userType);
+        
+        // Redirect based on user type
+        if (response.data.userType === "candidate") {
+          navigate("/candidate-dashboard");
+        } else if (response.data.userType === "employer") {
+          navigate("/employer-dashboard");
+        } else {
+          navigate("/dashboard"); // Fallback to a general dashboard if needed
+        }
       }
     } catch (error) {
       setFormState((prevState) => ({
@@ -116,9 +124,6 @@ function AuthForm() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 font-poppins">
@@ -194,50 +199,50 @@ function AuthForm() {
             </div>
           </div>
           {formState.isSignUp && (
-            <div className="group">
-              <label htmlFor="confirmPassword" className="sr-only">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-purple-400 transition-colors duration-200" />
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  id="confirmPassword"
-                  autoComplete="current-password"
-                  required
-                  className="pl-10 pr-3 py-3 w-full rounded-lg border-2 border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ease-in-out"
-                  placeholder="Confirm Password"
-                  value={formState.confirmPassword}
-                  onChange={handleChange}
-                />
+            <>
+              <div className="group">
+                <label htmlFor="confirmPassword" className="sr-only">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-purple-400 transition-colors duration-200" />
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    autoComplete="current-password"
+                    required
+                    className="pl-10 pr-3 py-3 w-full rounded-lg border-2 border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ease-in-out"
+                    placeholder="Confirm Password"
+                    value={formState.confirmPassword}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-          {formState.isSignUp && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                I am a:
-              </label>
-              <div className="flex space-x-4">
-                {["candidate", "employer"].map((type) => (
-                  <label
-                    key={type}
-                    className="flex items-center space-x-2 cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name="userType"
-                      value={type}
-                      checked={formState.userType === type}
-                      onChange={handleChange}
-                      className="form-radio h-4 w-4 text-purple-600 transition duration-150 ease-in-out"
-                    />
-                    <span className="text-gray-300 capitalize">{type}</span>
-                  </label>
-                ))}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  I am a:
+                </label>
+                <div className="flex space-x-4">
+                  {["candidate", "employer"].map((type) => (
+                    <label
+                      key={type}
+                      className="flex items-center space-x-2 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="userType"
+                        value={type}
+                        checked={formState.userType === type}
+                        onChange={handleChange}
+                        className="form-radio h-4 w-4 text-purple-600 transition duration-150 ease-in-out"
+                      />
+                      <span className="text-gray-300 capitalize">{type}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
           {formState.error && (
             <p className="text-red-400 text-center text-sm">
@@ -282,18 +287,6 @@ function AuthForm() {
             )}
           </button>
         </form>
-        <div className="flex items-center justify-center mt-4">
-          <div className="border-t border-gray-500 flex-grow mr-3"></div>
-          <span className="text-gray-300">OR</span>
-          <div className="border-t border-gray-500 flex-grow ml-3"></div>
-        </div>
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex justify-center py-3 px-4 mt-4 border border-gray-600 rounded-lg shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300"
-        >
-          <FaGoogle className="mr-2" />
-          Sign in with Google
-        </button>
         <div className="mt-4 text-center">
           <p className="text-gray-400 text-sm">
             {formState.isSignUp
