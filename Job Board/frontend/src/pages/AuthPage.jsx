@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 function AuthForm() {
   const location = useLocation();
@@ -63,10 +64,11 @@ function AuthForm() {
     }
     return true;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     setFormState((prevState) => ({
       ...prevState,
       isLoading: true,
@@ -74,12 +76,15 @@ function AuthForm() {
       success: "",
     }));
     const { isSignUp, email, password, name, userType } = formState;
-
+  
+    // Replace this with your actual API URL
+    const API_URL = "http://localhost:5000";
+  
     try {
       let response;
       if (isSignUp) {
         response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/auth/register`,
+          `${API_URL}/api/auth/register`,
           {
             name,
             email,
@@ -89,12 +94,17 @@ function AuthForm() {
         );
         setFormState((prevState) => ({
           ...prevState,
-          success: "Registration successful! You can now log in.",
-          isSignUp: false, // Switch to login mode after successful registration
+          isSignUp: false,
+          success: "Registration successful! Please log in.",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          name: "",
+          userType: "candidate",
         }));
       } else {
         response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/auth/login`,
+          `${API_URL}/api/auth/login`,
           {
             email,
             password,
@@ -103,13 +113,12 @@ function AuthForm() {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("userType", response.data.userType);
         
-        // Redirect based on user type
         if (response.data.userType === "candidate") {
-          navigate("/candidate-dashboard");
+          navigate("/candidate");
         } else if (response.data.userType === "employer") {
-          navigate("/employer-dashboard");
+          navigate("/employer");
         } else {
-          navigate("/dashboard"); // Fallback to a general dashboard if needed
+          navigate("/dashboard");
         }
       }
     } catch (error) {
@@ -123,16 +132,26 @@ function AuthForm() {
       setFormState((prevState) => ({ ...prevState, isLoading: false }));
     }
   };
-
-
+  
+  
   return (
-    <div className="min-h-screen bg-gray-900 flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 font-poppins">
-      <div className="max-w-md w-full space-y-8 p-10 bg-gray-800 rounded-3xl shadow-2xl text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 font-poppins">
+      <motion.div 
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full space-y-8 p-10 bg-gray-800 rounded-3xl shadow-2xl text-white relative overflow-hidden"
+      >
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500"></div>
         <div className="text-center">
-          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+          <motion.h2 
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
+          >
             {formState.isSignUp ? "Join CareerLaunch" : "Welcome Back"}
-          </h2>
+          </motion.h2>
           <p className="mt-2 text-sm text-gray-400">
             {formState.isSignUp
               ? "Start your professional journey today"
@@ -254,10 +273,12 @@ function AuthForm() {
               {formState.success}
             </p>
           )}
-          <button
+          <motion.button
             type="submit"
             disabled={formState.isLoading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300 transform hover:scale-105"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300"
           >
             {formState.isLoading ? (
               <svg
@@ -285,23 +306,25 @@ function AuthForm() {
             ) : (
               "Sign In"
             )}
-          </button>
+          </motion.button>
         </form>
         <div className="mt-4 text-center">
           <p className="text-gray-400 text-sm">
             {formState.isSignUp
               ? "Already have an account? "
               : "Don't have an account? "}
-            <button
+            <motion.button
               type="button"
               onClick={toggleFormMode}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="text-purple-500 hover:text-purple-400 focus:outline-none transition duration-200"
             >
               {formState.isSignUp ? "Sign In" : "Sign Up"}
-            </button>
+            </motion.button>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

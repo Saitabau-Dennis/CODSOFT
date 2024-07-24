@@ -1,27 +1,24 @@
-import React, { useState } from "react";
-import { Routes, Route, Link, useParams } from "react-router-dom";
-import {
-  FaSearch,
-  FaMapMarkerAlt,
-  FaBriefcase,
-  FaUpload,
-  FaUser,
-} from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Link, useParams, useNavigate } from "react-router-dom";
+import { FaSearch, FaMapMarkerAlt, FaBriefcase, FaUpload, FaUser, FaDollarSign, FaCalendar } from "react-icons/fa";
 import Footer from "../components/Footer";
+import axios from "axios";
+
+const API_BASE_URL = "http://localhost:5000/api";
 
 function CandidateDashboard() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white font-poppins flex flex-col">
+    <div className="min-h-screen bg-gray-900 text-white font-poppins flex flex-col text-sm">
       <Header />
-      <div className="flex-grow">
+      <main className="flex-grow">
         <Routes>
           <Route index element={<JobSearch />} />
+          <Route path="jobs" element={<JobListing />} />
           <Route path="jobs/:id" element={<JobDetail />} />
           <Route path="apply/:id" element={<JobApplication />} />
           <Route path="profile" element={<ProfileManagement />} />
-          <Route path="job-listing" element={<JobListing />} />
         </Routes>
-      </div>
+      </main>
       <Footer />
     </div>
   );
@@ -29,25 +26,16 @@ function CandidateDashboard() {
 
 function Header() {
   return (
-    <header className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-      <nav className="container mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center">
-        <Link
-          to="/candidate"
-          className="text-2xl font-extrabold text-purple-500 tracking-wider mb-4 sm:mb-0"
-        >
+    <header className="bg-gray-800 text-white shadow-lg sticky top-0 z-50">
+      <nav className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <Link to="/candidate" className="text-xl font-bold text-purple-500">
           CareerLaunch
         </Link>
-        <div className="space-x-4 sm:space-x-6">
-          <Link
-            to="/candidate/job-listing"
-            className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
-          >
+        <div className="space-x-4">
+          <Link to="/candidate/jobs" className="text-sm hover:text-purple-400 transition duration-300">
             Job Listings
           </Link>
-          <Link
-            to="/candidate/profile"
-            className="text-base text-gray-300 hover:text-purple-400 transition duration-300 font-medium"
-          >
+          <Link to="/candidate/profile" className="text-sm hover:text-purple-400 transition duration-300">
             Profile
           </Link>
         </div>
@@ -57,20 +45,30 @@ function Header() {
 }
 
 function JobSearch() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [location, setLocation] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/candidate/jobs?search=${searchTerm}&location=${location}`);
+  };
+
   return (
-    <section className="bg-gray-900 text-white py-16 sm:py-24 mb-16 sm:mb-32">
-      <div className="container mx-auto px-4 sm:px-6 text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4">Find Your Dream Job</h1>
-        <p className="text-xl mb-8">Discover opportunities that match your skills and aspirations</p>
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8">Search for Jobs</h2>
-        <div className="bg-gray-800 rounded-xl p-4 sm:p-6 shadow-2xl max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+    <section className="bg-gray-900 text-white py-12 mb-12">
+      <div className="container mx-auto px-4 text-center">
+        <h1 className="text-3xl font-bold mb-3">Find Your Dream Job</h1>
+        <p className="text-base mb-6">Discover opportunities that match your skills and aspirations</p>
+        <form onSubmit={handleSearch} className="bg-gray-800 rounded-xl p-4 shadow-2xl max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
             <div className="flex-1 relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Job title, keywords, or company"
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex-1 relative">
@@ -78,144 +76,105 @@ function JobSearch() {
               <input
                 type="text"
                 placeholder="City, state, or remote"
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               />
             </div>
-            <button className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 flex items-center justify-center text-base transform hover:scale-105">
+            <button
+              type="submit"
+              className="bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 flex items-center justify-center text-sm"
+            >
               <FaSearch className="mr-2" />
               Search Jobs
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </section>
   );
 }
 
 function JobListing() {
-  const [jobs] = useState([
-    {
-      id: 1,
-      title: "AI Research Scientist",
-      company: "TechNova",
-      location: "San Francisco, CA",
-      type: "Full-time",
-    },
-    {
-      id: 2,
-      title: "Digital Marketing Strategist",
-      company: "GrowthPulse",
-      location: "New York, NY",
-      type: "Full-time",
-    },
-    {
-      id: 3,
-      title: "Senior UX/UI Designer",
-      company: "DesignSphere",
-      location: "Remote",
-      type: "Contract",
-    },
-    {
-      id: 4,
-      title: "Data Science Team Lead",
-      company: "DataNexus",
-      location: "Austin, TX",
-      type: "Full-time",
-    },
-    // More jobs...
-  ]);
-  const [jobType, setJobType] = useState("");
-  const [sortCriteria, setSortCriteria] = useState("title");
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 2;
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Filter jobs by type
-  const filteredJobs = jobType
-    ? jobs.filter((job) => job.type === jobType)
-    : jobs;
+  useEffect(() => {
+    fetchJobs(currentPage);
+  }, [currentPage]);
 
-  // Sort jobs
-  const sortedJobs = filteredJobs.sort((a, b) => {
-    if (sortCriteria === "title") {
-      return a.title.localeCompare(b.title);
-    } else if (sortCriteria === "location") {
-      return a.location.localeCompare(b.location);
-    } else {
-      return a.company.localeCompare(b.company);
+  const fetchJobs = async (page) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/jobs?page=${page}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const { jobs, totalPages } = response.data;
+      setJobs(jobs);
+      setTotalPages(totalPages);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+      setError(err.message);
+      setLoading(false);
     }
-  });
-
-  // Pagination logic
-  const indexOfLastJob = currentPage * jobsPerPage;
-  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = sortedJobs.slice(indexOfFirstJob, indexOfLastJob);
-
-  const totalPages = Math.ceil(sortedJobs.length / jobsPerPage);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
   };
 
+  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
+
   return (
-    <section className="py-16 sm:py-24 bg-gray-900 text-white">
-      <div className="container mx-auto px-4 sm:px-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Job Listings</h2>
-        <div className="flex justify-between mb-6">
-          <select
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg"
-            value={jobType}
-            onChange={(e) => setJobType(e.target.value)}
-          >
-            <option value="">All Job Types</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Contract">Contract</option>
-          </select>
-          <select
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg"
-            value={sortCriteria}
-            onChange={(e) => setSortCriteria(e.target.value)}
-          >
-            <option value="title">Sort by Title</option>
-            <option value="location">Sort by Location</option>
-            <option value="company">Sort by Company</option>
-          </select>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
-          {currentJobs.map((job) => (
-            <Link
-              to={`/candidate/jobs/${job.id}`}
-              key={job.id}
-              className="block bg-gray-800 rounded-xl p-6 shadow-xl hover:shadow-2xl transition duration-300 ease-in-out border-l-4 border-purple-500 transform hover:scale-105"
-            >
-              <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
-              <p className="text-purple-400 mb-3 font-medium text-lg">
-                {job.company}
-              </p>
-              <div className="flex items-center text-gray-400 mb-2 text-base">
-                <FaMapMarkerAlt className="mr-2" />
-                <span>{job.location}</span>
-              </div>
-              <div className="flex items-center text-gray-400 text-base">
-                <FaBriefcase className="mr-2" />
-                <span>{job.type}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-        <div className="flex justify-center mt-8">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              className={`px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold hover:bg-purple-700 transition duration-300 mr-2 ${
-                currentPage === index + 1 ? "bg-purple-700" : ""
-              }`}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
+    <section className="py-12 bg-gray-900 text-white">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold text-center mb-6">Job Listings</h2>
+        {jobs.length > 0 ? (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {jobs.map((job) => (
+              <Link
+                to={`/candidate/jobs/${job.id}`}
+                key={job.id}
+                className="block bg-gray-800 rounded-xl p-4 shadow-xl hover:shadow-2xl transition duration-300 ease-in-out border-l-4 border-purple-500"
+              >
+                <h3 className="text-lg font-semibold mb-1">{job.title}</h3>
+                <p className="text-purple-400 mb-2 text-sm">{job.company}</p>
+                <div className="flex items-center text-gray-400 mb-1 text-xs">
+                  <FaMapMarkerAlt className="mr-1" />
+                  <span>{job.location}</span>
+                </div>
+                <div className="flex items-center text-gray-400 text-xs">
+                  <FaBriefcase className="mr-1" />
+                  <span>{job.job_type}</span>
+                </div>
+                <p className="text-gray-400 text-xs mt-2 truncate">{job.description}</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center">No jobs found.</p>
+        )}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-6">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`mx-1 px-3 py-1 rounded ${
+                  currentPage === i + 1 ? "bg-purple-600" : "bg-gray-700"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -223,49 +182,72 @@ function JobListing() {
 
 function JobDetail() {
   const { id } = useParams();
-  const job = {
-    id,
-    title: "AI Research Scientist",
-    company: "TechNova",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    description:
-      "We are looking for an AI Research Scientist to join our team at TechNova. You will be responsible for developing and implementing state-of-the-art AI solutions.",
-    requirements: [
-      "PhD in Computer Science or related field",
-      "Experience with machine learning and AI",
-      "Strong programming skills in Python",
-    ],
-  };
+  const [job, setJob] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchJobDetails = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error("No authentication token found. Please log in.");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/jobs/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setJob(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching job details:", err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchJobDetails();
+  }, [id]);
+
+  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
+  if (!job) return <div className="text-center py-12">Job not found</div>;
 
   return (
-    <section className="py-24 bg-gray-900 text-white">
-      <div className="container mx-auto px-6">
+    <section className="py-12 bg-gray-900 text-white">
+      <div className="container mx-auto px-4">
         <div className="bg-gray-800 rounded-xl p-6 shadow-xl">
-          <h2 className="text-3xl font-bold mb-4">{job.title}</h2>
-          <p className="text-purple-400 mb-3 font-medium text-lg">
-            {job.company}
-          </p>
-          <div className="flex items-center text-gray-400 mb-2 text-base">
-            <FaMapMarkerAlt className="mr-2" />
-            <span>{job.location}</span>
+          <h2 className="text-3xl font-bold mb-2">{job.title}</h2>
+          <p className="text-purple-400 mb-4 text-lg">{job.company}</p>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="flex items-center text-gray-400 text-sm">
+              <FaMapMarkerAlt className="mr-2" />
+              <span>{job.location}</span>
+            </div>
+            <div className="flex items-center text-gray-400 text-sm">
+              <FaBriefcase className="mr-2" />
+              <span>{job.job_type}</span>
+            </div>
+            <div className="flex items-center text-gray-400 text-sm">
+              <FaDollarSign className="mr-2" />
+              <span>{job.salary}</span>
+            </div>
+            <div className="flex items-center text-gray-400 text-sm">
+              <FaCalendar className="mr-2" />
+              <span>Posted on: {new Date(job.created_at).toLocaleDateString()}</span>
+            </div>
           </div>
-          <div className="flex items-center text-gray-400 text-base mb-4">
-            <FaBriefcase className="mr-2" />
-            <span>{job.type}</span>
-          </div>
-          <p className="mb-4">{job.description}</p>
+          <h3 className="text-xl font-semibold mb-2">Job Description:</h3>
+          <p className="mb-6 text-sm">{job.description}</p>
           <h3 className="text-xl font-semibold mb-2">Requirements:</h3>
-          <ul className="list-disc list-inside mb-4">
-            {job.requirements.map((req, index) => (
-              <li key={index} className="text-gray-400">
-                {req}
-              </li>
+          <ul className="list-disc list-inside mb-6 text-sm">
+            {job.requirements.split("\n").map((req, index) => (
+              <li key={index} className="text-gray-400 mb-1">{req}</li>
             ))}
           </ul>
           <Link
             to={`/candidate/apply/${job.id}`}
-            className="bg-purple-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-purple-700 transition duration-300 inline-block text-base transform hover:scale-105"
+            className="bg-purple-600 text-white font-semibold px-6 py-2 rounded-full hover:bg-purple-700 transition duration-300 text-sm inline-block"
           >
             Apply Now
           </Link>
@@ -277,50 +259,118 @@ function JobDetail() {
 
 function JobApplication() {
   const { id } = useParams();
+  const [formData, setFormData] = useState({ name: "", email: "", resume: null });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData(prev => ({ ...prev, resume: e.target.files[0] }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("resume", formData.resume);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      await axios.post(`${API_BASE_URL}/jobs/${id}/apply`, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      setSuccess(true);
+    } catch (err) {
+      console.error("Error submitting application:", err);
+      setError(err.message);
+    }
+
+    setLoading(false);
+  };
+
+  if (success) {
+    return (
+      <section className="py-12 bg-gray-900 text-white">
+        <div className="container mx-auto px-4">
+          <div className="bg-gray-800 rounded-xl p-6 shadow-xl">
+            <h2 className="text-2xl font-bold mb-4">Application Submitted</h2>
+            <p>Your application has been successfully submitted. We'll be in touch soon!</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="py-24 bg-gray-900 text-white">
-      <div className="container mx-auto px-6">
+    <section className="py-12 bg-gray-900 text-white">
+      <div className="container mx-auto px-4">
         <div className="bg-gray-800 rounded-xl p-6 shadow-xl">
-          <h2 className="text-3xl font-bold mb-4">Apply for Job ID: {id}</h2>
-          <form className="space-y-4">
+          <h2 className="text-2xl font-bold mb-4">Apply for Job ID: {id}</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col">
-              <label className="mb-2 font-semibold" htmlFor="name">
-                Name:
-              </label>
+              <label className="mb-1 font-semibold text-sm" htmlFor="name">Name:</label>
               <input
                 type="text"
                 id="name"
-                className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-2 font-semibold" htmlFor="email">
-                Email:
-              </label>
+              <label className="mb-1 font-semibold text-sm" htmlFor="email">Email:</label>
               <input
                 type="email"
                 id="email"
-                className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+               className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-2 font-semibold" htmlFor="resume">
-                Upload Resume:
-              </label>
-              <input type="file" id="resume" className="hidden" />
+              <label className="mb-1 font-semibold text-sm" htmlFor="resume">Upload Resume:</label>
+              <input
+                type="file"
+                id="resume"
+                onChange={handleFileChange}
+                className="hidden"
+                required
+              ></input>
               <label
                 htmlFor="resume"
-                className="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold text-base hover:bg-purple-700 transition duration-300 cursor-pointer inline-flex items-center transform hover:scale-105"
+                className="bg-purple-600 text-white px-6 py-2 rounded-full font-semibold text-sm hover:bg-purple-700 transition duration-300 cursor-pointer inline-flex items-center"
               >
-                <FaUpload className="mr-2" /> Upload Your Resume
+                <FaUpload className="mr-2" />
+                {formData.resume ? formData.resume.name : "Upload Your Resume"}
               </label>
             </div>
+            {error && <p className="text-red-500">{error}</p>}
             <button
               type="submit"
-              className="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold text-base hover:bg-purple-700 transition duration-300 inline-block transform hover:scale-105"
+              disabled={loading}
+              className="bg-purple-600 text-white px-6 py-2 rounded-full font-semibold text-sm hover:bg-purple-700 transition duration-300 inline-block"
             >
-              Submit Application
+              {loading ? "Submitting..." : "Submit Application"}
             </button>
           </form>
         </div>
@@ -330,94 +380,145 @@ function JobApplication() {
 }
 
 function ProfileManagement() {
+  const [profile, setProfile] = useState({
+    fullName: "",
+    email: "",
+    degree: "",
+    jobTitle: "",
+    skills: ""
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProfile(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      await axios.put(`${API_BASE_URL}/profile`, profile, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLoading(false);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className="text-center py-12">Loading...</div>;
+  if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
+
   return (
-    <section className="py-24 bg-gray-900 text-white">
-      <div className="container mx-auto px-6">
-        <div className="bg-gray-800 rounded-xl p-6 shadow-xl">
-          <h2 className="text-3xl font-bold mb-4">Profile Management</h2>
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center space-x-4">
-              <FaUser className="text-2xl text-purple-500" />
-              <div>
-                <h3 className="text-xl font-semibold">John Doe</h3>
-                <p className="text-gray-400">john.doe@example.com</p>
-              </div>
+    <section className="py-8 bg-gray-900 text-white">
+      <div className="container mx-auto px-4 max-w-2xl">
+        <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
+          <h2 className="text-xl font-bold mb-4">Profile Management</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <InputField
+              label="Full Name"
+              id="fullName"
+              type="text"
+              value={profile.fullName}
+              onChange={handleInputChange}
+            />
+            <InputField
+              label="Email"
+              id="email"
+              type="email"
+              value={profile.email}
+              onChange={handleInputChange}
+            />
+            <InputField
+              label="Degree"
+              id="degree"
+              type="text"
+              value={profile.degree}
+              onChange={handleInputChange}
+            />
+            <InputField
+              label="Job Title"
+              id="jobTitle"
+              type="text"
+              value={profile.jobTitle}
+              onChange={handleInputChange}
+            />
+            <div className="flex flex-col">
+              <label className="mb-1 text-xs font-semibold" htmlFor="skills">Skills:</label>
+              <textarea
+                id="skills"
+                name="skills"
+                value={profile.skills}
+                onChange={handleInputChange}
+                className="px-3 py-2 rounded border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
+                rows="3"
+              ></textarea>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-2">
-                Personal Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col">
-                  <label className="mb-2 font-semibold" htmlFor="fullname">
-                    Full Name:
-                  </label>
-                  <input
-                    type="text"
-                    id="fullname"
-                    className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="mb-2 font-semibold" htmlFor="email">
-                    Email:
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
-                  />
-                </div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Education</h3>
-              <div className="flex flex-col">
-                <label className="mb-2 font-semibold" htmlFor="degree">
-                  Degree:
-                </label>
-                <input
-                  type="text"
-                  id="degree"
-                  className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
-                />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Experience</h3>
-              <div className="flex flex-col">
-                <label className="mb-2 font-semibold" htmlFor="jobTitle">
-                  Job Title:
-                </label>
-                <input
-                  type="text"
-                  id="jobTitle"
-                  className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
-                />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Skills</h3>
-              <div className="flex flex-col">
-                <label className="mb-2 font-semibold" htmlFor="skills">
-                  Skills:
-                </label>
-                <textarea
-                  id="skills"
-                  className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
-                  rows="3"
-                ></textarea>
-              </div>
-            </div>
-            <button className="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold text-base hover:bg-purple-700 transition duration-300 inline-block transform hover:scale-105">
-              Save Changes
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-purple-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-purple-700 transition duration-300"
+            >
+              {loading ? "Saving..." : "Save Changes"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </section>
   );
 }
 
+function InputField({ label, id, type, value, onChange }) {
+  return (
+    <div className="flex flex-col">
+      <label className="mb-1 text-xs font-semibold" htmlFor={id}>
+        {label}:
+      </label>
+      <input
+        type={type}
+        id={id}
+        name={id}
+        value={value}
+        onChange={onChange}
+        className="px-3 py-2 rounded border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
+      />
+    </div>
+  );
+}
+<Footer/>
 export default CandidateDashboard;
-
